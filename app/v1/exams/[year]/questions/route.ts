@@ -31,10 +31,10 @@ export async function GET(
             getSearchParamsAsObject(searchParams),
         );
 
-        if (Number(limit) > 50) {
+        if (Number(limit) > 90) {
             throw new EnemApiError({
                 code: 'bad_request',
-                message: 'Limit cannot be greater than 50',
+                message: 'Limit cannot be greater than 90',
             });
         }
 

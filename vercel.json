@@ -2,11 +2,7 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://api.enem.dev/:path*"
-        },
-        {
-            "source": "/docs/:path*",
-            "destination": "https://docs.enem.dev/:path*"
+            "destination": "https://enem.luansilva.dev/:path*"
         }
     ]
 }

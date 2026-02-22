@@ -13,8 +13,8 @@ const fontSans = FontSans({
 });
 
 export const viewport: Viewport = {
-    themeColor: 'black',
-    colorScheme: 'dark',
+    themeColor: 'white',
+    colorScheme: 'light',
 };
 
 const TITLE = 'API ENEM';
@@ -50,7 +50,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <body
                 className={cn(
                     'bg-background min-h-screen font-sans antialiased',
