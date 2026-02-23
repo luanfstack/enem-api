@@ -18,8 +18,9 @@ type Params = {
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: Params },
+    { params }: { params: Promise<Params> },
 ) {
+    const { year, index } = await params;
     try {
         const { rateLimitHeaders } = rateLimiter.check(request);
 
@@ -31,12 +32,12 @@ export async function GET(
             getSearchParamsAsObject(searchParams),
         );
 
-        const exam = await getExamDetails(params.year);
+        const exam = await getExamDetails(year);
 
         if (!exam) {
             throw new EnemApiError({
                 code: 'not_found',
-                message: `No exam found for year ${params.year}`,
+                message: `No exam found for year ${year}`,
             });
         }
 
@@ -52,15 +53,15 @@ export async function GET(
         }
 
         const questionDetails = await getQuestionDetails({
-            year: params.year,
-            index: params.index,
+            year: year,
+            index: index,
             language,
         });
 
         if (!questionDetails) {
             throw new EnemApiError({
                 code: 'not_found',
-                message: `Question ${params.index} not found in exam ${params.year}`,
+                message: `Question ${index} not found in exam ${year}`,
             });
         }
 

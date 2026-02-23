@@ -18,8 +18,9 @@ const rateLimiter = new RateLimiter();
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { year: string } },
+    { params }: { params: Promise<{ year: string }> },
 ) {
+    const { year } = await params;
     try {
         const { rateLimitHeaders } = rateLimiter.check(request);
 
@@ -38,12 +39,12 @@ export async function GET(
             });
         }
 
-        const exam = await getExamDetails(params.year);
+        const exam = await getExamDetails(year);
 
         if (!exam) {
             throw new EnemApiError({
                 code: 'not_found',
-                message: `No exam found for year ${params.year}`,
+                message: `No exam found for year ${year}`,
             });
         }
 
@@ -72,7 +73,7 @@ export async function GET(
 
         for (const question of questionsToFetch) {
             const questionDetails = await getQuestionDetails({
-                year: params.year,
+                year: year,
                 index: question.index,
                 language,
             });

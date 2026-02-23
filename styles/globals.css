@@ -1,3 +1,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    @media (prefers-contrast: high) {
+        :root {
+            --color-neutral-900: #000000;
+            --color-neutral-100: #ffffff;
+            --color-neutral-200: #e5e5e5;
+            --color-neutral-500: #737373;
+            --color-neutral-600: #525252;
+            --color-neutral-700: #404040;
+            --color-neutral-800: #262626;
+        }
+    }
+
+    *:focus-visible {
+        outline: 2px solid theme("colors.neutral.500");
+        outline-offset: 2px;
+    }
+
+    @media (pointer: coarse) {
+        button,
+        [role="button"],
+        input[type="button"],
+        input[type="submit"],
+        input[type="reset"] {
+            min-height: 44px;
+            min-width: 44px;
+        }
+    }
+
+    @media (min-resolution: 120dpi) {
+        body {
+            font-size: clamp(16px, 4vw, 18px);
+        }
+    }
+
+    @layer base {
+        *,
+        ::after,
+        ::before,
+        ::backdrop,
+        ::file-selector-button {
+            border-color: var(--color-gray-200, currentcolor);
+        }
+    }
+}

@@ -30,19 +30,9 @@ const speakeasyErrorOverrides: Record<z.infer<typeof ErrorCode>, string> = {
 
 const ErrorSchema = z.object({
     error: z.object({
-        code: ErrorCode.openapi({
-            description: 'A short code indicating the error code returned.',
-            example: 'not_found',
-        }),
-        message: z.string().openapi({
-            description: 'A human readable error message.',
-            example: 'The requested resource was not found.',
-        }),
-        docUrl: z.string().optional().openapi({
-            description:
-                'A URL to more information about the error code reported.',
-            example: 'https://enem.dev/docs',
-        }),
+        code: ErrorCode,
+        message: z.string(),
+        docUrl: z.string().optional(),
     }),
 });
 
@@ -107,7 +97,6 @@ export function handleApiError(
 ): ErrorResponse & { status: number; headers?: Record<string, string> } {
     console.error('API error occurred', error.message);
 
-    // Zod errors
     if (error instanceof ZodError) {
         return {
             ...fromZodError(error),
@@ -115,7 +104,6 @@ export function handleApiError(
         };
     }
 
-    // EnemApiError errors
     if (error instanceof EnemApiError) {
         return {
             error: {
@@ -128,8 +116,6 @@ export function handleApiError(
         };
     }
 
-    // Fallback
-    // Unhandled errors are not user-facing, so we don't expose the actual error
     return {
         error: {
             code: 'internal_server_error',
