@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { QuestionDetailSchema } from "@/lib/zod/schemas/questions";
 import z from "@/lib/zod";
 import { useState } from "react";
-import { Separator } from "./ui/separator";
 
 type QuestionDetail = z.infer<typeof QuestionDetailSchema>;
 
@@ -44,7 +43,7 @@ export function ResultView({
   const [filter, setFilter] = useState(FILTER.ALL);
   const [alert, setAlert] = useState(false);
 
-  const toltaComplete = answers.reduce(
+  const toltalComplete = answers.reduce(
     (acc, answer) => (answer ? acc + 1 : acc),
     0,
   );
@@ -54,10 +53,6 @@ export function ResultView({
       answer === questions[idx].correctAlternative ? acc + 1 : acc,
     0,
   );
-
-  const handleFilter = (value: number) => {
-    setFilter(value);
-  };
 
   const filteredQuestions = questions.filter((_, index) => {
     switch (filter) {
@@ -80,68 +75,43 @@ export function ResultView({
   return (
     <>
       <main className="min-h-dvh w-full bg-white" role="main">
-        <div
-          className="mx-auto max-w-2xl bg-white px-8 py-14 shadow-[0_
-1px_3px_rgba(0,0,0,0.08)] min-h-dvh md:shadow-[0_2px_8px_rgba(0,0,0,0.06)] md:rounded-xs"
-        >
+        <div className="mx-auto max-w-2xl bg-white px-8 py-14 shadow-[0_1px_3px_rgba(0,0,0,0.08)] min-h-dvh md:shadow-[0_2px_8px_rgba(0,0,0,0.06)] md:rounded-xs">
           <header className="text-center">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500">
-              Clique para filtrar
-            </p>
-            <div className="flex flex-wrap justify-center gap-2 mb-6">
-              {finished ? (
-                <>
-                  <Button
-                    className="flex-1 min-w-[120px]"
-                    onClick={() => handleFilter(FILTER.ALL)}
-                  >
-                    Todas {`(${questions.length})`}
-                  </Button>
-                  <Button
-                    className="flex-1 min-w-[120px] text-neutral-600 border-green-500 bg-green-50 ring-1 ring-green-500 hover:bg-green-100"
-                    onClick={() => handleFilter(FILTER.CORRECT)}
-                  >
-                    Corretas {`(${totalCorrect})`}
-                  </Button>
-                  <Button
-                    className="flex-1 min-w-[120px] text-neutral-600 border-red-500 bg-red-50 ring-1 ring-red-500 hover:bg-red-100"
-                    onClick={() => handleFilter(FILTER.INCORRECT)}
-                  >
-                    Erradas {`(${questions.length - totalCorrect})`}
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    className="flex-1 min-w-[120px]"
-                    onClick={() => handleFilter(FILTER.ALL)}
-                  >
-                    Todas {`(${questions.length})`}
-                  </Button>
-                  <Button
-                    className="flex-1 min-w-[120px] border border-neutral-200 bg-white text-neutral-800 hover:border-neutral-300 hover:bg-neutral-50"
-                    onClick={() => handleFilter(FILTER.INCOMPLETE)}
-                  >
-                    Em Branco {`(${questions.length - toltaComplete})`}
-                  </Button>
-                  <Button
-                    className="flex-1 min-w-[120px]"
-                    onClick={() => handleFilter(FILTER.COMPLETE)}
-                  >
-                    Respondidas {`(${toltaComplete})`}
-                  </Button>
-                </>
-              )}
+            <div className="flex flex-wrap sm:flex-row items-center justify-center gap-2 mb-6">
+              <label
+                htmlFor="filter-select"
+                className="text-lg font-semibold text-neutral-700"
+              >
+                Filtrar por:
+              </label>
+              <select
+                id="filter-select"
+                className="w-fit appearance-none border-black bg-black text-white sm:w-auto p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black text-center text-lg font-semibold"
+                value={filter}
+                onChange={(e) => setFilter(Number(e.target.value))}
+              >
+                <option value={FILTER.ALL}>Todas ({questions.length})</option>
+                <option value={finished ? FILTER.CORRECT : FILTER.COMPLETE}>
+                  {finished
+                    ? `Corretas (${totalCorrect})`
+                    : `Completas (${toltalComplete})`}
+                </option>
+                <option value={finished ? FILTER.INCORRECT : FILTER.INCOMPLETE}>
+                  {finished
+                    ? `Incorretas (${questions.length - totalCorrect})`
+                    : `Incompletas (${questions.length - toltalComplete})`}
+                </option>
+              </select>
             </div>
           </header>
           <section
-            className="flex flex-wrap"
+            className="flex flex-wrap justify-center"
             aria-labelledby="results-title"
             aria-describedby="results-instruction"
           >
             {filteredQuestions.map((question) => {
-              const isCorrect =
-                question.correctAlternative === answers[question.index % 90];
+              const answer =
+                answers[questions.findIndex((q) => q.index === question.index)];
               return (
                 <Button
                   key={question.index}
@@ -153,15 +123,15 @@ export function ResultView({
                   }}
                   className={`mx-2 text-sm font-medium text-neutral-600 w-12 h-12 sm:w-10 sm:h-10 my-2 transition-all focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 ${
                     finished
-                      ? isCorrect
+                      ? answer === question.correctAlternative
                         ? "border-green-500 bg-green-50 ring-1 ring-green-500 hover:bg-green-100"
-                        : "border-red-500 bg-red-50 ring-1 ring-red-500 hover:bg-red-100"
+                        : answer === null
+                          ? "border-yellow-500 bg-yellow-50 ring-1 ring-yellow-500 hover:bg-yellow-100"
+                          : "border-red-500 bg-red-50 ring-1 ring-red-500 hover:bg-red-100"
                       : answers[(question.index % 90) - 1]
                         ? "border-black bg-black text-white hover:bg-neutral-800"
                         : "border border-neutral-200 bg-white text-neutral-800 hover:border-neutral-300 hover:bg-neutral-50"
                   }`}
-                  aria-label={`Questão ${question.index}: ${isCorrect ? "Correta" : "Incorreta"}. Clique para visualizar.`}
-                  aria-pressed={false}
                 >
                   {question.index}
                 </Button>
@@ -180,7 +150,7 @@ export function ResultView({
             <Button
               onClick={() => {
                 if (finished) {
-                  setYear(null);
+                  setYear(2023);
                   setDay(null);
                   setLanguage(null);
                   setShowResult(false);
@@ -190,10 +160,12 @@ export function ResultView({
                   setFilter(FILTER.ALL);
                   setAlert(false);
                 } else {
-                  if (toltaComplete < questions.length && !alert) {
+                  if (toltalComplete < questions.length && !alert) {
                     setAlert(true);
                   } else {
+                    setAlert(false);
                     setFinished(true);
+                    setFilter(FILTER.ALL);
                   }
                 }
               }}

@@ -13,7 +13,7 @@ export default function Home() {
     { length: 2023 - 2009 + 1 },
     (_, index) => 2009 + index,
   );
-  const [year, setYear] = useState<number | null>(null);
+  const [year, setYear] = useState<number | null>(2023);
   const [day, setDay] = useState<number | null>(null);
   const [language, setLanguage] = useState<string | null>(null);
   const [questions, setQuestions] = useState<QuestionDetail[]>([]);
@@ -23,23 +23,6 @@ export default function Home() {
   const [finished, setFinished] = useState(false);
   const [error, setError] = useState(false);
   const [showResult, setShowResult] = useState(false);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (questions.length === 0 || showResult) return;
-
-      if (event.key === "ArrowLeft" && index > 0) {
-        event.preventDefault();
-        setIndex((idx) => idx - 1);
-      } else if (event.key === "ArrowRight" && index < questions.length - 1) {
-        event.preventDefault();
-        setIndex((idx) => idx + 1);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [questions.length, index, showResult]);
 
   const getQuestions = async (
     year: number,
@@ -51,7 +34,7 @@ export default function Home() {
     try {
       const response = await fetch(
         `/v1/exams/${year}/questions?limit=90&offset=${
-          (day - 1) * 90 + 1
+          (day - 1) * 90
         }${language ? `&language=${language}` : ""}`,
       );
       if (response.ok) {
@@ -71,9 +54,13 @@ export default function Home() {
 
   const markAlternative = (alternative: string) => {
     if (finished) return;
-    const newAlternatives = [...answers];
-    newAlternatives[index] = alternative;
-    setAnswers(newAlternatives);
+    if (answers[index] === alternative && index < questions.length - 1) {
+      setIndex((idx) => idx + 1);
+    } else {
+      const newAlternatives = [...answers];
+      newAlternatives[index] = alternative;
+      setAnswers(newAlternatives);
+    }
   };
 
   if (showResult) {

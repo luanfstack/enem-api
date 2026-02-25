@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import * as Toast from "@radix-ui/react-toast";
+import { Toast } from "@/components/ui/toast";
 
 interface ExamSelectionViewProps {
   years: number[];
@@ -38,40 +38,29 @@ export function ExamSelectionView({
         </header>
         <div className="flex flex-col items-center gap-10 text-center text-neutral-800 flex-1">
           <section
-            className="w-full max-w-md"
+            className="w-fit max-w-md"
             aria-labelledby="year-selection-heading"
           >
-            <h2
-              id="year-selection-heading"
+            <label
+              htmlFor="year-select"
               className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-500"
             >
               Selecione o ano
-            </h2>
-            <div
-              className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2"
-              role="radiogroup"
-              aria-label="Anos disponíveis"
+            </label>
+            <select
+              id="year-select"
+              value={year || ""}
+              onChange={(e) => setYear(Number(e.target.value))}
+              disabled={loading}
+              className="w-full border-black bg-black text-white p-2 appearance-none border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black text-center text-lg font-semibold"
+              aria-describedby="year-selection-heading"
             >
-              {years.map((yearOption) => {
-                const isSelected = yearOption === year;
-                return (
-                  <Button
-                    key={yearOption}
-                    onClick={() => setYear(yearOption)}
-                    variant={isSelected ? "selected" : "outline"}
-                    size="sm"
-                    disabled={loading}
-                    className="h-12 w-full font-semibold transition-all hover:scale-105 active:scale-95 text-sm sm:text-base"
-                    aria-pressed={isSelected}
-                    aria-describedby="year-selection-heading"
-                    role="radio"
-                    aria-checked={isSelected}
-                  >
-                    {yearOption}
-                  </Button>
-                );
-              })}
-            </div>
+              {years.map((yearOption) => (
+                <option key={yearOption} value={yearOption}>
+                  {yearOption}
+                </option>
+              ))}
+            </select>
           </section>
           {year && (
             <section
@@ -99,7 +88,7 @@ export function ExamSelectionView({
                   aria-checked={day === 1}
                 >
                   <span className="truncate">
-                    1º dia - Linguagens e Ciências Humanas
+                    Linguagens e Ciências Humanas
                   </span>
                 </Button>
                 <Button
@@ -112,7 +101,7 @@ export function ExamSelectionView({
                   aria-checked={day === 2}
                 >
                   <span className="truncate">
-                    2º dia - Matemática e Ciências da Natureza
+                    Matemática e Ciências da Natureza
                   </span>
                 </Button>
               </div>
@@ -185,22 +174,12 @@ export function ExamSelectionView({
           </section>
         </div>
       </div>
-      <Toast.Provider swipeDirection="right">
-        <Toast.Root
-          className="fixed top-4 right-4 w-full max-w-xs p-4 rounded-md shadow-lg bg-white border border-gray-200 flex flex-col gap-1 z-50"
-          open={error}
-          onOpenChange={setError}
-        >
-          <Toast.Title className="font-semibold text-red-600">Erro</Toast.Title>
-          <Toast.Description asChild>
-            <span className="text-sm text-gray-700">
-              Ocorreu um erro ao carregar as questões. Por favor, tente
-              novamente.
-            </span>
-          </Toast.Description>
-        </Toast.Root>
-        <Toast.Viewport className="fixed top-4 right-4 w-full max-w-xs z-50" />
-      </Toast.Provider>
+      <Toast
+        open={error}
+        onOpenChange={setError}
+        title="Erro"
+        description="Ocorreu um erro ao carregar as questões. Por favor, tente novamente."
+      />
     </main>
   );
 }

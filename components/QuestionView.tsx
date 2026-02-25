@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeftCircleIcon,
-  ArrowRightCircleIcon,
+  ArrowBigLeft,
+  ArrowBigRight,
   CheckCircle2,
   XCircle,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { QuestionDetailSchema } from "@/lib/zod/schemas/questions";
 import z from "@/lib/zod";
+import { useRef } from "react";
 
 type QuestionDetail = z.infer<typeof QuestionDetailSchema>;
 
@@ -31,9 +32,37 @@ export function QuestionView({
   setShowResult,
 }: QuestionViewProps) {
   const question = questions[index];
+  const touchStartX = useRef(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === 0) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const diffX = touchStartX.current - touchEndX;
+
+    if (Math.abs(diffX) > 50) {
+      if (diffX > 0 && index < questions.length - 1) {
+        setIndex((idx) => idx + 1);
+      } else if (diffX < 0 && index > 0) {
+        setIndex((idx) => idx - 1);
+      }
+    }
+
+    touchStartX.current = 0;
+  };
 
   return (
-    <main className="min-h-dvh w-full bg-white" role="main">
+    <main
+      className="min-h-dvh w-full bg-white"
+      role="main"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchMove={(e) => e.preventDefault()}
+    >
       <div className="text-neutral-800 mx-auto max-w-2xl bg-white px-8 pt-10 shadow-[0_1px_3px_rgba(0,0,0,0.08)] min-h-dvh md:shadow-[0_2px_8px_rgba(0,0,0,0.06)] md:rounded-xs pb-24">
         <article className="space-y-8 pb-8" aria-labelledby="question-title">
           <header className="flex justify-between items-center">
@@ -41,10 +70,10 @@ export function QuestionView({
               {index > 0 && (
                 <button
                   onClick={() => setIndex((idx) => idx - 1)}
-                  className="flex items-center justify-center p-1 rounded-full hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 transition-colors"
+                  className="flex items-center justify-center p-1 rounded-full focus-outline-none transition-colors"
                   aria-label="Questão anterior"
                 >
-                  <ArrowLeftCircleIcon className="h-11" />
+                  <ArrowBigLeft className="h-11" />
                 </button>
               )}
             </div>
@@ -58,10 +87,10 @@ export function QuestionView({
               {index < questions.length - 1 && (
                 <button
                   onClick={() => setIndex((idx) => idx + 1)}
-                  className="flex items-center justify-center p-1 rounded-full hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 transition-colors"
+                  className="flex items-center justify-center p-1 rounded-full focus:outline-none transition-colors"
                   aria-label="Próxima questão"
                 >
-                  <ArrowRightCircleIcon className="h-11" />
+                  <ArrowBigRight className="h-11" />
                 </button>
               )}
             </div>
@@ -93,24 +122,18 @@ export function QuestionView({
                 <li
                   key={alternative.letter}
                   onClick={() => markAlternative(alternative.letter)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      markAlternative(alternative.letter);
-                    }
-                  }}
                   tabIndex={0}
                   className={`flex cursor-pointer items-start gap-3 rounded-lg border py-3 px-4 transition-all duration-200 ${
-                    finished && alternative.isCorrect
-                      ? "border-green-500 bg-green-50 ring-1 ring-green-500"
-                      : finished &&
-                          (answers[index] === null ||
-                            (answers[index] === alternative.letter &&
-                              !alternative.isCorrect))
-                        ? "border-red-500 bg-red-50 ring-1 ring-red-500"
-                        : answers[index] === alternative.letter
-                          ? "border-neutral-900 border-2 bg-neutral-50 shadow-xs"
-                          : "border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50"
+                    finished
+                      ? alternative.isCorrect
+                        ? "border-green-500 bg-green-50 ring-1 ring-green-500"
+                        : answers[index] === null
+                          ? "border-yellow-500 bg-yellow-50 ring-1 ring-yellow-500 "
+                          : answers[index] === alternative.letter &&
+                            "border-red-500 bg-red-50 ring-1 ring-red-500"
+                      : answers[index] === alternative.letter
+                        ? "border-neutral-900 border-2 bg-neutral-50 shadow-xs"
+                        : "border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50"
                   }`}
                   role="radio"
                   aria-checked={answers[index] === alternative.letter}
@@ -118,16 +141,16 @@ export function QuestionView({
                 >
                   <span
                     className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
-                      finished && alternative.isCorrect
-                        ? "bg-green-600 text-white"
-                        : finished &&
-                            (!answers[index] ||
-                              answers[index] === alternative.letter) &&
-                            !alternative.isCorrect
-                          ? "bg-red-600 text-white"
-                          : answers[index] === alternative.letter
-                            ? "bg-neutral-900 text-white"
-                            : "bg-neutral-100 text-neutral-500"
+                      finished
+                        ? alternative.isCorrect
+                          ? "bg-green-600 text-white"
+                          : answers[index] === null
+                            ? "bg-yellow-500 text-white"
+                            : answers[index] === alternative.letter &&
+                              "bg-red-600 text-white"
+                        : answers[index] === alternative.letter
+                          ? "bg-neutral-900 text-white"
+                          : "bg-neutral-100 text-neutral-500"
                     }`}
                     aria-hidden="true"
                   >
