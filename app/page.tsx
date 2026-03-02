@@ -13,7 +13,7 @@ export default function Home() {
     { length: 2023 - 2009 + 1 },
     (_, index) => 2009 + index,
   );
-  const [year, setYear] = useState<number | null>(2023);
+  const [year, setYear] = useState<number>(2023);
   const [day, setDay] = useState<number | null>(null);
   const [language, setLanguage] = useState<string | null>(null);
   const [questions, setQuestions] = useState<QuestionDetail[]>([]);
@@ -23,6 +23,14 @@ export default function Home() {
   const [finished, setFinished] = useState(false);
   const [error, setError] = useState(false);
   const [showResult, setShowResult] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+  }, [index]);
 
   const getQuestions = async (
     year: number,

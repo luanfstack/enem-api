@@ -12,7 +12,7 @@ interface ResultViewProps {
   finished: boolean;
   setIndex: (index: number) => void;
   setShowResult: (show: boolean) => void;
-  setYear: (year: number | null) => void;
+  setYear: (year: number) => void;
   setDay: (day: number | null) => void;
   setLanguage: (language: string | null) => void;
   setQuestions: (questions: QuestionDetail[]) => void;

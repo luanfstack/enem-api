@@ -3,7 +3,7 @@ import { Toast } from "@/components/ui/toast";
 
 interface ExamSelectionViewProps {
   years: number[];
-  year: number | null;
+  year: number;
   setYear: (year: number) => void;
   day: number | null;
   setDay: (day: number) => void;
@@ -107,7 +107,7 @@ export function ExamSelectionView({
               </div>
             </section>
           )}
-          {day === 1 && (
+          {year > 2016 && day === 1 && (
             <section
               className="w-full max-w-md"
               aria-labelledby="language-selection-heading"
@@ -150,27 +150,32 @@ export function ExamSelectionView({
           )}
 
           <section className="mt-auto pt-8 w-full" aria-live="polite">
-            {year && (day === 2 || (day === 1 && language)) && (
-              <Button
-                onClick={() => getQuestions(year, day!, language)}
-                size="lg"
-                className="font-semibold"
-                disabled={loading}
-                aria-describedby={error ? "error-message" : undefined}
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2" aria-live="polite">
+            {year &&
+              (day === 2 ||
+                (year > 2016 ? day === 1 && language : day === 1)) && (
+                <Button
+                  onClick={() => getQuestions(year, day!, language)}
+                  size="lg"
+                  className="font-semibold"
+                  disabled={loading}
+                  aria-describedby={error ? "error-message" : undefined}
+                >
+                  {loading ? (
                     <span
-                      className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-                      aria-hidden="true"
-                    />
-                    Carregando
-                  </span>
-                ) : (
-                  "Iniciar"
-                )}
-              </Button>
-            )}
+                      className="flex items-center gap-2"
+                      aria-live="polite"
+                    >
+                      <span
+                        className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                        aria-hidden="true"
+                      />
+                      Carregando
+                    </span>
+                  ) : (
+                    "Iniciar"
+                  )}
+                </Button>
+              )}
           </section>
         </div>
       </div>

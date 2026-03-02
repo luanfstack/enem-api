@@ -44,7 +44,7 @@ export function QuestionView({
     const touchEndX = e.changedTouches[0].clientX;
     const diffX = touchStartX.current - touchEndX;
 
-    if (Math.abs(diffX) > 50) {
+    if (Math.abs(diffX) > 100) {
       if (diffX > 0 && index < questions.length - 1) {
         setIndex((idx) => idx + 1);
       } else if (diffX < 0 && index > 0) {
@@ -99,7 +99,7 @@ export function QuestionView({
             <ReactMarkdown
               components={{
                 p: ({ node, ...props }) => (
-                  <p className="text-left block" {...props} />
+                  <p className="text-left block break-all" {...props} />
                 ),
               }}
             >
@@ -107,12 +107,7 @@ export function QuestionView({
             </ReactMarkdown>
           </section>
           <section className="space-y-4" aria-labelledby="alternatives-intro">
-            <p
-              id="alternatives-intro"
-              className="text-sm font-medium text-neutral-600"
-            >
-              {question.alternativesIntroduction}
-            </p>
+            <p id="alternatives-intro">{question.alternativesIntroduction}</p>
             <ul
               className="space-y-3"
               role="radiogroup"
@@ -157,7 +152,13 @@ export function QuestionView({
                     {alternative.letter}
                   </span>
                   <div className="flex flex-1 justify-between items-center">
-                    <span className="text-neutral-800">{alternative.text}</span>
+                    {alternative.text ? (
+                      <span className="text-neutral-800">
+                        {alternative.text}
+                      </span>
+                    ) : (
+                      alternative.file && <img src={alternative.file} />
+                    )}
                     {finished && alternative.isCorrect && (
                       <CheckCircle2
                         className="h-5 w-5 text-green-600"
